@@ -1,0 +1,146 @@
+
+<!DOCTYPE html>
+
+<head>
+	<title>Space Game</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title></title>
+    <meta name="description" content="THIS is SPACE">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+	<meta name="apple-mobile-web-app-capable" content="yes">
+    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+</head>
+<body style="margin:0px;">
+
+<link href='http://fonts.googleapis.com/css?family=Orbitron:900' rel='stylesheet' type='text/css'>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+<script src="pixi.min.js"></script>
+
+<script>
+var keymovepower=0.08;
+var friction=0.965;
+
+var renderer = PIXI.autoDetectRenderer(window.innerWidth, window.innerHeight,{backgroundColor : 0x252525});
+document.body.appendChild(renderer.view);
+
+//players
+var keys = [];
+window.onkeyup = function(e) {keys[e.keyCode]=false;}
+window.onkeydown = function(e) {keys[e.keyCode]=true;}
+
+
+// create the root of the scene graph
+var stage = new PIXI.Container();
+var stage2 = new PIXI.Container();
+
+// create a texture from an image path
+var texture = PIXI.Texture.fromImage('player1.png');
+var bgtexture = PIXI.Texture.fromImage('bgsmall.png');
+var j1texture = PIXI.Texture.fromImage('SpaceJunk_001.png');
+
+// create a new Sprite using the texture
+var bunny = new PIXI.Sprite(texture);
+// var bg = new PIXI.TilingSprite(bgtexture,4104, 2736);
+var bg = new PIXI.Sprite(bgtexture);
+
+bunny.speed=0;
+bunny.movespeed=0.65;
+bunny.maxmovespeed=18;
+bunny.scale= new PIXI.Point(0.5, 0.5);
+
+// center the sprite's anchor point
+bunny.anchor.x = 0.5;
+bunny.anchor.y = 0.5;
+bg.anchor.x = 0.4;
+bg.anchor.y = 0.5;
+// bg.width=6000;
+// bg.height=4000;
+
+// move the sprite to the center of the screen
+bunny.position.x = window.innerWidth/2;
+bunny.position.y = window.innerHeight/2;;
+
+stage.addChild(bg);
+stage.addChild(bunny);
+
+// start animating
+init();
+animate();
+function animate() {
+    requestAnimationFrame(animate);
+
+    processInput();
+
+    // just for fun, let's rotate mr rabbit a little
+    // bunny.rotation += 0.1;
+
+    // render the container
+    bunny.speed=bunny.speed*friction;
+    if(bunny.speed>bunny.maxmovespeed)
+    	bunny.speed=bunny.maxmovespeed;
+    move(bunny,bunny.speed);
+    stage.addChild(stage2);
+    renderer.render(stage);
+
+}
+
+function processInput(){
+	if (keys[37])	//Left arrow
+		bunny.rotation-=keymovepower;
+	if (keys[39])	//Right arrow
+		bunny.rotation+=keymovepower;
+	if(keys[38]){    //Up Arrow
+		       
+		// bunny.position.x += (Math.cos((bunny.rotation%6) * 5));// * Time.deltaTime;
+		// bunny.position.y += (Math.sin((bunny.rotation%6) * 5));// * Time.deltaTime;
+		// object.x = object.x + distance * Math.cos(object.rotation);
+		// object.y = object.y + distance * Math.sin(object.rotation);
+		bunny.speed+=bunny.movespeed;
+		console.log(bunny.speed);
+	}
+
+}
+
+function move(object, distance) {
+	object.x = object.x + distance * 0.2 * Math.cos(object.rotation);
+	object.y = object.y + distance * 0.2 * Math.sin(object.rotation);
+
+	bg.x -= distance*0.9 * Math.cos(object.rotation); 
+	bg.y -= distance*0.9 * Math.sin(object.rotation);
+
+	stage2.x -= distance*0.9 * Math.cos(object.rotation); 
+	stage2.y -= distance*0.9 * Math.sin(object.rotation);
+	// stage2
+}
+
+function init(){
+	//add junk
+	var amount=100;
+	for (var i = 0; i < amount; i++) 
+	{
+		var junk = new PIXI.Sprite(j1texture);
+		junk.speedX = Math.random() * 10;
+		junk.speedY = (Math.random() * 10) - 5;
+		junk.anchor.y = 0.5;
+		junk.anchor.x = 0.5;
+		junk.position.x=Math.random() * 4000;
+		junk.position.y=Math.random() * 2400;
+		//junk.alpha = 0.3 + Math.random() * 0.7;
+		// junks.push(junk);
+		junk.scale.set(0.5 + Math.random()*0.5);
+
+		junk.rotation = (Math.random()-0.5)
+	
+		//junk.rotation = Math.random() - 0.5;
+		// var random = Math2.randomInt(0, container.children.length-2);
+		stage2.addChild(junk)//, random);		
+	}
+
+}
+
+	
+
+</script>
+</body>
+</html>
